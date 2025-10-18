@@ -1,21 +1,31 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { AuthProviders, UserRole } from "../lib/constants";
 
-@Schema({timestamps: true})
+@Schema({ timestamps: true })
 export class User {
-    @Prop({required: true, unique: true})
+    @Prop({ required: true, unique: true })
     email: string;
 
     @Prop({})
-    name: string;
+    fullname: string;
 
-    @Prop({ enum: ['customer', 'courier', 'admin'], index: true, immutable: true, required: true })
-    role: 'customer' | 'courier' | 'admin';
+    @Prop({ enum: UserRole, index: true, immutable: true, required: true })
+    role: UserRole;
 
-    @Prop({})
+    @Prop({ unique: true, sparse: true })
     phone_number: string;
-    
-    @Prop({ required: true })
-    password: string;
+
+    @Prop({ required: true, unique: true })
+    profile_img_url: string;
+
+    @Prop({ sparse: true })
+    password_hash: string;
+
+    @Prop({ type: String, required: true })
+    home_address: string;
+
+    @Prop({ type: [{ type: String, enum: AuthProviders }], default: ['default'] })
+    auth_providers: AuthProvider[];
 
 }
 

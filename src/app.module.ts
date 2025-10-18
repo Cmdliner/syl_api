@@ -7,7 +7,7 @@ import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(process.env.MONGO_URI!),
+    MongooseModule.forRoot(process.env.MONGO_URI ?? "mongodb://localhost://2717/test"),
     AuthModule,
     UsersModule,
   ],

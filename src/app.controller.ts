@@ -1,12 +1,19 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Redirect, Version, VERSION_NEUTRAL } from '@nestjs/common';
 import { AppService } from './app.service';
+
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+    constructor(private readonly appService: AppService) { }
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
+    @Get()
+    @Version(VERSION_NEUTRAL)
+    @Redirect('healthz')
+    getHello() { }
+
+    @Get('healthz')
+    @Version(VERSION_NEUTRAL)
+    getServerHealth() {
+        return { active: true, message: 'The hood is up Commandliner' }
+    }
 }
