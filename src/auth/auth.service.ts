@@ -1,10 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Body, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../users/user.schema';
 import { CreateCustomerDto } from './dtos/create-customer.dto';
-import { hash } from 'bcryptjs';
+import { compare, hash } from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
+import { CreateCourierDto } from './dtos/create-courier.dto';
+import { CreateAdminDto } from './dtos/create-admin.dto';
 
 @Injectable()
 export class AuthService {
@@ -14,14 +16,14 @@ export class AuthService {
     ) { }
 
     async createCustomer(customerData: CreateCustomerDto) {
-        const userExists = await this.userModel.find({
+        const matchedUsers = await this.userModel.find({
             $or: [
                 { email: customerData.email },
                 { phone_number: customerData.phone_number }
             ]
         });
 
-        if (userExists) throw new BadRequestException({ success: false, error: { message: 'Email or phone number in use' } });
+        if (matchedUsers.length) throw new BadRequestException({ success: false, error: { message: 'Email or phone number in use' } });
 
         const passwordHash = await hash(customerData.password!, 10);
         const user = await this.userModel.create({
@@ -33,24 +35,75 @@ export class AuthService {
             role: customerData.role
         });
 
-        const accessToken = await this.generateJWT({ sub: user.id }, 'my_secret');
-        return accessToken;
+        const access_token = await this.generateJWT({ sub: user.id, role: user.role }, 'my_secret');
+        return access_token;
 
     }
 
-    async createCourier() { }
+    async createCourier(courierData: CreateCourierDto) { 
+        const matchedUsers = await this.userModel.find({
+            $or: [
+                { email: courierData.email },
+                { phone_number: courierData.phone_number }
+            ]
+        });
 
-    async createAdmin() { }
+        if (matchedUsers.length) throw new BadRequestException({ success: false, error: { message: 'Email or phone number in use' } });
+
+        const passwordHash = await hash(courierData.password_hash!, 10);
+        const user = await this.userModel.create({
+            email: courierData.email,
+            home_address: courierData.home_address,
+            phone_number: courierData.phone_number,
+            password_hash: passwordHash,
+            auth_providers: [courierData.auth_provider],
+            role: courierData.role
+        });
+    }
+
+    async createAdmin(@Body() adminData: CreateAdminDto) {
+
+        const matchedUsers = await this.userModel.find({
+            $or: [
+                { email: adminData.email },
+                { phone_number: adminData.phone_number }
+            ]
+        });
+        
+        if (matchedUsers.length) throw new BadRequestException({ success: false, error: { message: 'Email or phone number in use' } });
+
+        const admin = await this.userModel.create({
+            email: adminData.email,
+            home_address: adminData.home_address,
+            phone_number: adminData.phone_number,
+            password_hash: await hash(adminData.password_hash!, 10),
+            auth_providers: [adminData.auth_provider],
+            role: adminData.role
+        });
+
+        const access_token = await this.generateJWT({ sub: admin.id, role: admin.role }, 'my_secret');
+        return {success: true, access_token: access_token};
+    }
 
     async createCustomerOrSignInWithGoogle() { }
 
-    async login() {
+    async login(email: string, password: string) {
+        const user = await this.userModel.findOne({ email });
+        if (!user) throw new BadRequestException({ success: false, error: { message: 'Invalid credentials' } });
 
+        const passwordsMatch = await this.verifyPassword(password, user.password_hash!);
+        if (!passwordsMatch) throw new BadRequestException({ success: false, error: { message: 'Invalid credentials' } });
+
+        const access_token = await this.generateJWT({ sub: user.id, role: user.role }, 'my_secret');
+        return access_token;
     }
+
 
     private async generateJWT(payload: Record<string, any>, secret: string) {
         return this.jwtService.signAsync(payload, { secret })
     }
 
-    // private async verifyJWT()
+    private async verifyPassword(password: string, hash: string) {
+        return compare(password, hash);
+    }
 }

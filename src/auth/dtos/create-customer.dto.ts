@@ -1,4 +1,4 @@
-import { IsEmail, IsPhoneNumber, IsString, IsIn, IsNotEmpty, IsStrongPassword, IsUrl, IsEnum } from "class-validator";
+import { IsEmail, IsPhoneNumber, IsNotEmpty, IsStrongPassword, IsUrl, IsEnum, Equals } from "class-validator";
 import { AuthProviders } from "src/lib/constants";
 
 export class CreateCustomerDto {
@@ -14,11 +14,12 @@ export class CreateCustomerDto {
     @IsStrongPassword()
     password?: string;
 
-    @IsUrl()
-    profile_img_url?: string;
+    // @IsUrl()
+    // profile_img_url?: string;
 
     @IsEnum(AuthProviders)
     auth_provider: AuthProvider;
 
-    role = 'customer';
+    @Equals('customer')
+    readonly role: UserRole = 'customer';
 }

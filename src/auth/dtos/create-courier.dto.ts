@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsIn, IsNotEmpty, IsPhoneNumber, IsString, IsStrongPassword, IsUrl } from "class-validator";
+import { Equals, IsEmail, IsEnum, IsIn, IsNotEmpty, IsPhoneNumber, IsString, IsStrongPassword, IsUrl } from "class-validator";
 import { AuthProviders } from "src/lib/constants";
 
 export class CreateCourierDto {
@@ -14,13 +14,14 @@ export class CreateCourierDto {
     @IsStrongPassword()
     password_hash?: string;
 
-    @IsUrl()
-    profile_img_url?: string;
+    // @IsUrl()
+    // profile_img_url?: string;
 
 
     @IsEnum(AuthProviders)
     auth_provider: AuthProvider;
 
-    role = 'courier';
+    @Equals('courier')
+    readonly role: UserRole = 'courier';
 
 }
