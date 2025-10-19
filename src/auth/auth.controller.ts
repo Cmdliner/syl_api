@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Post, Version } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Version } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateCustomerDto } from './dtos/create-customer.dto';
 import { UserLoginDto } from './dtos/user-login.dto';
+import { CreateCourierDto } from './dtos/create-courier.dto';
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
@@ -14,14 +15,16 @@ export class AuthController {
     }
 
     @Post('google/activate')
-    async googleAuthenticate() { }
+    async googleAuthenticate() {}
 
     @Post('courier/register')
-    async registerCourier() { }
+    async registerCourier(@Body() courierData: CreateCourierDto) {
+        const access_token = await this.authService.createCourier(courierData);
+        return { success: true, access_token };
+    }
 
-    @Post('admin/register')
-    async registerAdmin() { }
 
+    @HttpCode(HttpStatus.OK)
     @Post('login')
     async login(@Body() loginDto: UserLoginDto) {
         const access_token = await this.authService.login(loginDto.email, loginDto.password);

@@ -8,8 +8,6 @@ import { UserSchema } from './user.schema';
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
   ],
   controllers: [UsersController],
-  exports: [
-    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
-  ],
+  exports: [MongooseModule],
 })
-export class UsersModule {}
+export class UsersModule { }

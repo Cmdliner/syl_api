@@ -15,7 +15,7 @@ export class User {
     @Prop({ unique: true, sparse: true })
     phone_number: string;
 
-    @Prop({ required: false, unique: true })
+    @Prop({ required: false, unique: true, sparse: true })
     profile_img_url: string;
 
     @Prop({ sparse: true })

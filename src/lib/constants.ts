@@ -7,5 +7,5 @@ export const corsOpts: CorsOptions = {
 }
 
 
-export const UserRole = ['customer', 'courier', 'admin'] as const;
+export const UserRole = ['customer', 'courier'] as const;
 export const AuthProviders = ['google', 'apple', 'default'] as const;

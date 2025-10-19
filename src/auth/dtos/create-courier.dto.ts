@@ -12,7 +12,7 @@ export class CreateCourierDto {
     home_address: string;
 
     @IsStrongPassword()
-    password_hash?: string;
+    password?: string;
 
     // @IsUrl()
     // profile_img_url?: string;

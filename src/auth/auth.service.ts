@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../users/user.schema';
@@ -6,7 +6,6 @@ import { CreateCustomerDto } from './dtos/create-customer.dto';
 import { compare, hash } from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { CreateCourierDto } from './dtos/create-courier.dto';
-import { CreateAdminDto } from './dtos/create-admin.dto';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +22,7 @@ export class AuthService {
             ]
         });
 
-        if (matchedUsers.length) throw new BadRequestException({ success: false, error: { message: 'Email or phone number in use' } });
+        if (matchedUsers.length) throw new ConflictException({ message: 'Email or phone number in use' });
 
         const passwordHash = await hash(customerData.password!, 10);
         const user = await this.userModel.create({
@@ -40,7 +39,7 @@ export class AuthService {
 
     }
 
-    async createCourier(courierData: CreateCourierDto) { 
+    async createCourier(courierData: CreateCourierDto) {
         const matchedUsers = await this.userModel.find({
             $or: [
                 { email: courierData.email },
@@ -48,10 +47,10 @@ export class AuthService {
             ]
         });
 
-        if (matchedUsers.length) throw new BadRequestException({ success: false, error: { message: 'Email or phone number in use' } });
+        if (matchedUsers.length) throw new ConflictException({ message: 'Email or phone number in use' });
 
-        const passwordHash = await hash(courierData.password_hash!, 10);
-        const user = await this.userModel.create({
+        const passwordHash = await hash(courierData.password!, 10);
+        const courier = await this.userModel.create({
             email: courierData.email,
             home_address: courierData.home_address,
             phone_number: courierData.phone_number,
@@ -59,40 +58,18 @@ export class AuthService {
             auth_providers: [courierData.auth_provider],
             role: courierData.role
         });
-    }
 
-    async createAdmin(@Body() adminData: CreateAdminDto) {
-
-        const matchedUsers = await this.userModel.find({
-            $or: [
-                { email: adminData.email },
-                { phone_number: adminData.phone_number }
-            ]
-        });
-        
-        if (matchedUsers.length) throw new BadRequestException({ success: false, error: { message: 'Email or phone number in use' } });
-
-        const admin = await this.userModel.create({
-            email: adminData.email,
-            home_address: adminData.home_address,
-            phone_number: adminData.phone_number,
-            password_hash: await hash(adminData.password_hash!, 10),
-            auth_providers: [adminData.auth_provider],
-            role: adminData.role
-        });
-
-        const access_token = await this.generateJWT({ sub: admin.id, role: admin.role }, 'my_secret');
-        return {success: true, access_token: access_token};
+        return this.generateJWT({ sub: courier.id, role: courier.role }, 'my_secret');
     }
 
     async createCustomerOrSignInWithGoogle() { }
 
     async login(email: string, password: string) {
         const user = await this.userModel.findOne({ email });
-        if (!user) throw new BadRequestException({ success: false, error: { message: 'Invalid credentials' } });
+        if (!user) throw new UnauthorizedException({ message: 'Invalid credentials' });
 
         const passwordsMatch = await this.verifyPassword(password, user.password_hash!);
-        if (!passwordsMatch) throw new BadRequestException({ success: false, error: { message: 'Invalid credentials' } });
+        if (!passwordsMatch) throw new UnauthorizedException({ message: 'Invalid credentials' });
 
         const access_token = await this.generateJWT({ sub: user.id, role: user.role }, 'my_secret');
         return access_token;
