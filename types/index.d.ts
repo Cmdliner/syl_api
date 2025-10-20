@@ -1,7 +1,17 @@
-import { UserRole, AuthProviders, UserRole } from '../src/lib/constants';
+import { Role } from '../src/lib/roles.enum';
+import { AuthProviders } from '../src/lib/constants';
 
 declare global {
-    export type UserRole = typeof UserRole[number];
+    namespace Express {
+        interface Request {
+            user?: {
+                id: string;
+                role: Role;
+            };
+        }
+    }
     export type AuthProvider = typeof AuthProviders[number];
+    export type JwtPayload = { sub: string; role: Role };
+
 }
-export {};
+export { };

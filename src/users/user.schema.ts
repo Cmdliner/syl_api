@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { AuthProviders, UserRole } from "../lib/constants";
+import { Role } from "src/lib/roles.enum";
 
 @Schema({ timestamps: true })
 export class User {
@@ -10,7 +11,7 @@ export class User {
     fullname: string;
 
     @Prop({ enum: UserRole, index: true, immutable: true, required: true })
-    role: UserRole;
+    role: Role;
 
     @Prop({ unique: true, sparse: true })
     phone_number: string;

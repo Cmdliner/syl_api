@@ -1,5 +1,6 @@
-import { Equals, IsEmail, IsEnum, IsIn, IsNotEmpty, IsPhoneNumber, IsString, IsStrongPassword, IsUrl } from "class-validator";
+import { Equals, IsEmail, IsEnum, IsIn, IsNotEmpty, IsPhoneNumber, IsStrongPassword } from "class-validator";
 import { AuthProviders } from "src/lib/constants";
+import { Role } from "src/lib/roles.enum";
 
 export class CreateCourierDto {
     @IsEmail()
@@ -22,6 +23,6 @@ export class CreateCourierDto {
     auth_provider: AuthProvider;
 
     @Equals('courier')
-    readonly role: UserRole = 'courier';
+    readonly role: Role = Role.COURIER;
 
 }

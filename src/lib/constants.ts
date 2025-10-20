@@ -1,4 +1,5 @@
 import { CorsOptions } from "@nestjs/common/interfaces/external/cors-options.interface";
+import { Role } from "./roles.enum";
 
 export const corsOpts: CorsOptions = {
     methods: ['POST', 'PUT', 'GET', 'PATCH', 'DELETE'],
@@ -7,5 +8,5 @@ export const corsOpts: CorsOptions = {
 }
 
 
-export const UserRole = ['customer', 'courier'] as const;
+export const UserRole = Object.values(Role);
 export const AuthProviders = ['google', 'apple', 'default'] as const;

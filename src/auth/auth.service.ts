@@ -34,7 +34,7 @@ export class AuthService {
             role: customerData.role
         });
 
-        const access_token = await this.generateJWT({ sub: user.id, role: user.role }, 'my_secret');
+        const access_token = await this.generateJWT({ sub: user.id, role: user.role });
         return access_token;
 
     }
@@ -59,7 +59,7 @@ export class AuthService {
             role: courierData.role
         });
 
-        return this.generateJWT({ sub: courier.id, role: courier.role }, 'my_secret');
+        return this.generateJWT({ sub: courier.id, role: courier.role });
     }
 
     async createCustomerOrSignInWithGoogle() { }
@@ -71,13 +71,13 @@ export class AuthService {
         const passwordsMatch = await this.verifyPassword(password, user.password_hash!);
         if (!passwordsMatch) throw new UnauthorizedException({ message: 'Invalid credentials' });
 
-        const access_token = await this.generateJWT({ sub: user.id, role: user.role }, 'my_secret');
+        const access_token = await this.generateJWT({ sub: user.id, role: user.role });
         return access_token;
     }
 
 
-    private async generateJWT(payload: Record<string, any>, secret: string) {
-        return this.jwtService.signAsync(payload, { secret })
+    private async generateJWT(payload: JwtPayload, secret: string = process.env.JWT_SECRET!) {
+        return this.jwtService.signAsync<JwtPayload>(payload, { secret })
     }
 
     private async verifyPassword(password: string, hash: string) {

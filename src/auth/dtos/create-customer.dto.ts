@@ -1,5 +1,6 @@
 import { IsEmail, IsPhoneNumber, IsNotEmpty, IsStrongPassword, IsUrl, IsEnum, Equals } from "class-validator";
 import { AuthProviders } from "src/lib/constants";
+import { Role } from "src/lib/roles.enum";
 
 export class CreateCustomerDto {
     @IsEmail()
@@ -21,5 +22,5 @@ export class CreateCustomerDto {
     auth_provider: AuthProvider;
 
     @Equals('customer')
-    readonly role: UserRole = 'customer';
+    readonly role: Role = Role.CUSTOMER;
 }
