@@ -1,6 +1,6 @@
 import { IsEmail, IsPhoneNumber, IsNotEmpty, IsStrongPassword, IsUrl, IsEnum, Equals } from "class-validator";
 import { AuthProviders } from "src/lib/constants";
-import { Role } from "src/lib/roles.enum";
+import { Role } from "../../lib/roles.enum";
 
 export class CreateCustomerDto {
     @IsEmail()

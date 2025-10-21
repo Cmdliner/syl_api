@@ -7,7 +7,7 @@ export const corsOpts: CorsOptions = {
     credentials: true
 }
 
-
 export const UserRole = Object.values(Role);
 export const AuthProviders = ['google', 'apple', 'default'] as const;
 export const CLOUDINARY = 'cloudinary';
+export const PARCEL_STATUS = ['delivered', 'in_transit', 'unassigned'] as const;

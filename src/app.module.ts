@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { AdminModule } from './admin/admin.module';
 import { ConfigModule } from '@nestjs/config';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { ParcelsModule } from './parcels/parcels.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     UsersModule,
     AdminModule,
     CloudinaryModule,
+    ParcelsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

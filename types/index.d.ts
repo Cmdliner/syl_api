@@ -1,5 +1,5 @@
 import { Role } from '../src/lib/roles.enum';
-import { AuthProviders } from '../src/lib/constants';
+import { AuthProviders, PARCEL_STATUS } from '../src/lib/constants';
 import { v2 as cloudianryv2, UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
 
 
@@ -19,6 +19,8 @@ declare global {
 
     export type CloudinaryV2 = typeof cloudianryv2;
     export type CloudinaryResponse = UploadApiResponse | UploadApiErrorResponse;
+
+    export type ParcelStatus = typeof PARCEL_STATUS[number];
 
 }
 export { };
