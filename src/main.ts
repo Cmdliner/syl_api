@@ -4,7 +4,7 @@ import { UnprocessableEntityException, ValidationPipe, VersioningType } from '@n
 import { corsOpts } from './lib/constants';
 import * as compression from 'compression';
 import helmet from 'helmet';
-import { HttpExceptionFilter } from './filters/http-exception.filter';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
