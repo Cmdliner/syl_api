@@ -15,9 +15,6 @@ export class CreateCustomerDto {
     @IsStrongPassword()
     password?: string;
 
-    // @IsUrl()
-    // profile_img_url?: string;
-
     @IsEnum(AuthProviders)
     auth_provider: AuthProvider;
 

@@ -17,7 +17,10 @@ export class User {
     phone_number: string;
 
     @Prop({ required: false, unique: true, sparse: true })
-    profile_img_url: string;
+    profile_img: {
+        public_id: string;
+        secure_url: string;
+    }
 
     @Prop({ sparse: true })
     password_hash: string;

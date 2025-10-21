@@ -8,7 +8,7 @@ export class CloudinaryService {
     constructor(@Inject(CLOUDINARY) private readonly cloudinaryV2: CloudinaryV2)  {}
 
     async uploadFile(file: Express.Multer.File, options: UploadApiOptions = {}) {
-        return new Promise((resolve, reject) => {
+        return new Promise<CloudinaryResponse>((resolve, reject) => {
             const uploadOpts: UploadApiOptions = {
                 folder: options.folder || 'uploads',
                 resource_type: options.resource_type || 'auto',
@@ -20,7 +20,7 @@ export class CloudinaryService {
                 uploadOpts,
                 (error, result) => {
                     if (error) return reject(error);
-                    resolve(result);
+                    resolve(result!);
                 }
             );
             const bufferStream = new Readable();
