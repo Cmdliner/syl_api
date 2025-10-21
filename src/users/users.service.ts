@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { User } from './user.schema';
+import { User } from './schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
@@ -10,6 +10,10 @@ export class UsersService {
         @InjectModel(User.name) private readonly userModel: Model<User>,
         private readonly cloudinaryService: CloudinaryService
     ) { }
+
+    async profileInformation(userId: string) {
+        return this.userModel.findById(userId, { $select: ["-password_hash"]});
+    }
 
     async uploadProfileImage(userId: string, file: Express.Multer.File) {
         const result = await this.cloudinaryService.uploadFile(file, {

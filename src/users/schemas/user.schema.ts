@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { AuthProviders, UserRole } from "../lib/constants";
+import { AuthProviders, UserRole } from "../../lib/constants";
 import { Role } from "src/lib/roles.enum";
 
 @Schema({ timestamps: true })

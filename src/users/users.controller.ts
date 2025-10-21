@@ -1,4 +1,4 @@
-import { Controller, Put, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Put, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfileImageFilePipe } from '../common/pipes/profile-image-file.pipe';
 import { AuthGuard } from '../common/guards/auth.guard';
@@ -15,7 +15,14 @@ export class UsersController {
     constructor(private readonly userService: UsersService) { }
 
 
-    @Get() 
+    @Get()
+    async getProfileInfo(@User('id') userId: string) {
+        const profile_info = this.userService.profileInformation(userId);
+        if (!profile_info) throw new NotFoundException({ message: 'User not found' });
+        
+        return { success: true, message: 'Fetched profile information successfully', data: { profile_info } }
+    }
+
     @Put('profile-image')
     @UseInterceptors(FileInterceptor('profile_img'))
     async uploadProfileImage(@User('id') id: string, @UploadedFile(ProfileImageFilePipe) file: Express.Multer.File) {
