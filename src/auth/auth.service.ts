@@ -75,7 +75,6 @@ export class AuthService {
         return access_token;
     }
 
-
     private async generateJWT(payload: JwtPayload, secret: string = process.env.JWT_SECRET!) {
         return this.jwtService.signAsync<JwtPayload>(payload, { secret })
     }

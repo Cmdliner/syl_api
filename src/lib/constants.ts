@@ -10,3 +10,4 @@ export const corsOpts: CorsOptions = {
 
 export const UserRole = Object.values(Role);
 export const AuthProviders = ['google', 'apple', 'default'] as const;
+export const CLOUDINARY = 'cloudinary';
