@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { User } from './schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
@@ -12,7 +12,13 @@ export class UsersService {
     ) { }
 
     async profileInformation(userId: string) {
-        return this.userModel.findById(userId, { $select: ["-password_hash"]});
+        const user = await this.userModel.findById(userId)
+        .select('-password_hash -__v')
+        .lean()
+        .exec();
+        
+        if(!user) throw new NotFoundException({message: 'User not found'});
+        return user;
     }
 
     async uploadProfileImage(userId: string, file: Express.Multer.File) {
