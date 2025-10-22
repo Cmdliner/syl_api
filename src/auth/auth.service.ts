@@ -6,26 +6,32 @@ import { CreateCustomerDto } from './dtos/create-customer.dto';
 import { compare, hash } from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { CreateRiderDto } from './dtos/create-rider.dto';
+import { Customer } from 'src/users/schemas/discriminators/customer.schema';
+import { Rider } from 'src/users/schemas/discriminators/rider.schema';
 
 @Injectable()
 export class AuthService {
     constructor(
         @InjectModel(User.name) private readonly userModel: Model<User>,
+        @InjectModel(Customer.name) private readonly customerModel: Model<Customer>,
+        @InjectModel(Rider.name) private readonly riderModel: Model<Rider>,
         private readonly jwtService: JwtService
     ) { }
 
     async createCustomer(customerData: CreateCustomerDto) {
-        const matchedUsers = await this.userModel.find({
+        const existingCustomers = await this.customerModel.find({
+            role: customerData.role,
             $or: [
                 { email: customerData.email },
-                { phone_number: customerData.phone_number }
+                { phone_number: customerData.phone_number },
+                
             ]
         });
 
-        if (matchedUsers.length) throw new ConflictException({ message: 'Email or phone number in use' });
+        if (existingCustomers.length) throw new ConflictException({ message: 'Email or phone number in use' });
 
         const passwordHash = await hash(customerData.password!, 10);
-        const user = await this.userModel.create({
+        const customer = await this.customerModel.create({
             email: customerData.email,
             home_address: customerData.home_address,
             phone_number: customerData.phone_number,
@@ -34,23 +40,24 @@ export class AuthService {
             role: customerData.role
         });
 
-        const access_token = await this.generateJWT({ sub: user.id, role: user.role });
+        const access_token = await this.generateJWT({ sub: customer.id, role: customer.role });
         return access_token;
 
     }
 
     async createRider(riderData: CreateRiderDto) {
-        const matchedUsers = await this.userModel.find({
+        const existingRiders = await this.riderModel.find({
+            role: riderData.role,
             $or: [
                 { email: riderData.email },
                 { phone_number: riderData.phone_number }
             ]
         });
 
-        if (matchedUsers.length) throw new ConflictException({ message: 'Email or phone number in use' });
+        if (existingRiders.length) throw new ConflictException({ message: 'Email or phone number in use' });
 
         const passwordHash = await hash(riderData.password!, 10);
-        const rider = await this.userModel.create({
+        const rider = await this.riderModel.create({
             email: riderData.email,
             home_address: riderData.home_address,
             phone_number: riderData.phone_number,
@@ -64,8 +71,19 @@ export class AuthService {
 
     async createCustomerOrSignInWithGoogle() { }
 
-    async login(email: string, password: string) {
-        const user = await this.userModel.findOne({ email });
+    async loginRider(email: string, password: string) {
+        const user = await this.riderModel.findOne({ email });
+        if (!user) throw new UnauthorizedException({ message: 'Invalid credentials' });
+
+        const passwordsMatch = await this.verifyPassword(password, user.password_hash!);
+        if (!passwordsMatch) throw new UnauthorizedException({ message: 'Invalid credentials' });
+
+        const access_token = await this.generateJWT({ sub: user.id, role: user.role });
+        return access_token;
+    }
+    
+    async loginCustomer(email: string, password: string) {
+        const user = await this.customerModel.findOne({ email });
         if (!user) throw new UnauthorizedException({ message: 'Invalid credentials' });
 
         const passwordsMatch = await this.verifyPassword(password, user.password_hash!);

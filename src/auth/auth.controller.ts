@@ -24,9 +24,16 @@ export class AuthController {
     }
 
     @HttpCode(HttpStatus.OK)
-    @Post('login')
-    async login(@Body() loginDto: UserLoginDto) {
-        const access_token = await this.authService.login(loginDto.email, loginDto.password);
+    @Post('login/rider')
+    async loginRider(@Body() loginDto: UserLoginDto) {
+        const access_token = await this.authService.loginRider(loginDto.email, loginDto.password);
+        return { success: true, access_token };
+    }
+    
+    @HttpCode(HttpStatus.OK)
+    @Post('login/customer')
+    async loginCustomer(@Body() loginDto: UserLoginDto) {
+        const access_token = await this.authService.loginCustomer(loginDto.email, loginDto.password);
         return { success: true, access_token };
     }
 }
