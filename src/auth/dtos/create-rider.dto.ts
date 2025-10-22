@@ -2,7 +2,7 @@ import { Equals, IsEmail, IsEnum, IsIn, IsNotEmpty, IsPhoneNumber, IsStrongPassw
 import { AuthProviders } from "src/lib/constants";
 import { Role } from "src/lib/roles.enum";
 
-export class CreateCourierDto {
+export class CreateRiderDto {
     @IsEmail()
     email: string;
 
@@ -18,7 +18,7 @@ export class CreateCourierDto {
     @IsEnum(AuthProviders)
     auth_provider: AuthProvider;
 
-    @Equals('courier')
-    readonly role: Role = Role.COURIER;
+    @Equals('rider')
+    readonly role: Role = Role.RIDER;
 
 }

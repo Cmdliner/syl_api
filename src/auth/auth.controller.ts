@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, Version } from '@nes
 import { AuthService } from './auth.service';
 import { CreateCustomerDto } from './dtos/create-customer.dto';
 import { UserLoginDto } from './dtos/user-login.dto';
-import { CreateCourierDto } from './dtos/create-courier.dto';
+import { CreateRiderDto } from './dtos/create-rider.dto';
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
@@ -17,12 +17,11 @@ export class AuthController {
     @Post('google/activate')
     async googleAuthenticate() {}
 
-    @Post('courier/register')
-    async registerCourier(@Body() courierData: CreateCourierDto) {
-        const access_token = await this.authService.createCourier(courierData);
+    @Post('rider/register')
+    async registerRider(@Body() riderData: CreateRiderDto) {
+        const access_token = await this.authService.createRider(riderData);
         return { success: true, access_token };
     }
-
 
     @HttpCode(HttpStatus.OK)
     @Post('login')
@@ -30,5 +29,4 @@ export class AuthController {
         const access_token = await this.authService.login(loginDto.email, loginDto.password);
         return { success: true, access_token };
     }
-
 }

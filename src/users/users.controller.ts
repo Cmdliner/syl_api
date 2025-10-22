@@ -8,7 +8,7 @@ import { User } from '../common/decorators/user.decorator';
 import { UsersService } from './users.service';
 
 @UseGuards(AuthGuard)
-@Roles(Role.CUSTOMER, Role.COURIER)
+@Roles(Role.CUSTOMER, Role.RIDER)
 @Controller('users')
 export class UsersController {
 

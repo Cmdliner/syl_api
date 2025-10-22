@@ -24,7 +24,7 @@ export class Parcel {
     tracking_id: string; // !todo => use a uuid or naoid or short code generator for this
 
     @Prop({ type: MongooseSchema.Types.ObjectId, ref: "User" })
-    assigned_courier: Types.ObjectId;
+    assigned_rider: Types.ObjectId;
 }
 
 export const ParcelSchema = SchemaFactory.createForClass(Parcel);

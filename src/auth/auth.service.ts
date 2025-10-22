@@ -5,7 +5,7 @@ import { User } from '../users/schemas/user.schema';
 import { CreateCustomerDto } from './dtos/create-customer.dto';
 import { compare, hash } from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-import { CreateCourierDto } from './dtos/create-courier.dto';
+import { CreateRiderDto } from './dtos/create-rider.dto';
 
 @Injectable()
 export class AuthService {
@@ -39,27 +39,27 @@ export class AuthService {
 
     }
 
-    async createCourier(courierData: CreateCourierDto) {
+    async createRider(riderData: CreateRiderDto) {
         const matchedUsers = await this.userModel.find({
             $or: [
-                { email: courierData.email },
-                { phone_number: courierData.phone_number }
+                { email: riderData.email },
+                { phone_number: riderData.phone_number }
             ]
         });
 
         if (matchedUsers.length) throw new ConflictException({ message: 'Email or phone number in use' });
 
-        const passwordHash = await hash(courierData.password!, 10);
-        const courier = await this.userModel.create({
-            email: courierData.email,
-            home_address: courierData.home_address,
-            phone_number: courierData.phone_number,
+        const passwordHash = await hash(riderData.password!, 10);
+        const rider = await this.userModel.create({
+            email: riderData.email,
+            home_address: riderData.home_address,
+            phone_number: riderData.phone_number,
             password_hash: passwordHash,
-            auth_providers: [courierData.auth_provider],
-            role: courierData.role
+            auth_providers: [riderData.auth_provider],
+            role: riderData.role
         });
 
-        return this.generateJWT({ sub: courier.id, role: courier.role });
+        return this.generateJWT({ sub: rider.id, role: rider.role });
     }
 
     async createCustomerOrSignInWithGoogle() { }
