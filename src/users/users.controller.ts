@@ -9,25 +9,24 @@ import { UsersService } from './users.service';
 
 @UseGuards(AuthGuard)
 @Roles(Role.CUSTOMER, Role.RIDER)
-@Controller('users')
+@Controller({ path: 'users', version: '1' })
 export class UsersController {
 
     constructor(private readonly userService: UsersService) { }
 
-
     @Get()
-    async getProfileInfo(@User('id') userId: string) {
-        const profile_info = this.userService.profileInformation(userId);
+    async getProfileInfo(@User() user: RequestUser) {
+        const profile_info = this.userService.profileInformation(user.id);
         if (!profile_info) throw new NotFoundException({ message: 'User not found' });
-        
+
         return { success: true, message: 'Fetched profile information successfully', data: { profile_info } }
     }
 
-    @Put('profile-image')
+    @Put('profile-picture')
     @UseInterceptors(FileInterceptor('profile_img'))
-    async uploadProfileImage(@User('id') id: string, @UploadedFile(ProfileImageFilePipe) file: Express.Multer.File) {
-        const { profile_image } = await this.userService.uploadProfileImage(id, file)
-        return { success: true, message: 'Profile image uploaded successfully', data: { profile_image } };
+    async uploadProfileImage(@User() user: RequestUser, @UploadedFile(ProfileImageFilePipe) file: Express.Multer.File) {
+        const data = await this.userService.uploadProfileImage(user.id, file)
+        return { success: true, message: 'Profile image uploaded successfully', data };
     }
 
 }

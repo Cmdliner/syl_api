@@ -4,7 +4,7 @@ import { v2 as cloudianryv2, UploadApiErrorResponse, UploadApiResponse } from 'c
 
 
 declare global {
-    
+
     namespace Express {
         interface Request {
             user?: {
@@ -21,6 +21,8 @@ declare global {
     export type CloudinaryResponse = UploadApiResponse | UploadApiErrorResponse;
 
     export type ParcelStatus = typeof PARCEL_STATUS[number];
+
+    export type RequestUser = { id: string; role: Role; }
 
 }
 export { };
