@@ -1,5 +1,6 @@
 import { CorsOptions } from "@nestjs/common/interfaces/external/cors-options.interface";
 import { Role } from "./roles.enum";
+import { DeliveryType, ParcelStatus, ParcelType } from "./parcel.enum";
 
 export const corsOpts: CorsOptions = {
     methods: ['POST', 'PUT', 'GET', 'PATCH', 'DELETE'],
@@ -10,4 +11,6 @@ export const corsOpts: CorsOptions = {
 export const UserRole = Object.values(Role);
 export const AuthProviders = ['google', 'apple', 'default'] as const;
 export const CLOUDINARY = 'cloudinary';
-export const PARCEL_STATUS = ['delivered', 'in_transit', 'unassigned'] as const;
+export const PARCEL_STATUS = Object.values(ParcelStatus);
+export const DELIVERY_TYPE = Object.values(DeliveryType);
+export const PARCEL_TYPE = Object.values(ParcelType);

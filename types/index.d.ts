@@ -20,9 +20,10 @@ declare global {
     export type CloudinaryV2 = typeof cloudianryv2;
     export type CloudinaryResponse = UploadApiResponse | UploadApiErrorResponse;
 
-    export type ParcelStatus = typeof PARCEL_STATUS[number];
-
     export type RequestUser = { id: string; role: Role; }
+
+    export type Longitude = number;
+    export type Latitude = number;
 
 }
 export { };
