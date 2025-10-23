@@ -1,4 +1,5 @@
-import { Role } from '../src/lib/roles.enum';
+import { Types } from 'mongoose';
+import { Role } from '../src/common/enums/roles.enum';
 import { AuthProviders, PARCEL_STATUS } from '../src/lib/constants';
 import { v2 as cloudianryv2, UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
 
@@ -24,6 +25,8 @@ declare global {
 
     export type Longitude = number;
     export type Latitude = number;
+
+    export type MongoId = Types.ObjectId;
 
 }
 export { };

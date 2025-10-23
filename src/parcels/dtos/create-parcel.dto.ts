@@ -1,5 +1,5 @@
 import { DeliveryType } from "cloudinary";
-import { ParcelType } from "src/lib/parcel.enum";
+import { ParcelType } from "src/common/enums/parcel.enum";
 
 export class CreateParcelDto {
 
@@ -19,12 +19,12 @@ export class CreateParcelDto {
     dimensions: string;
 
     pickup_location: {
-        human_readable: string;
+        address: string;
         coordinates: [Longitude, Latitude];
     };
 
     dropoff_location: {
-        human_readable: string;
+        address: string;
         coordinates: [Longitude, Latitude];
     }
 

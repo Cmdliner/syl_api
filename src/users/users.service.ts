@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { User } from './schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
@@ -13,11 +13,11 @@ export class UsersService {
 
     async profileInformation(userId: string) {
         const user = await this.userModel.findById(userId)
-        .select('-password_hash -__v')
-        .lean()
-        .exec();
-        
-        if(!user) throw new NotFoundException({message: 'User not found'});
+            .select('-password_hash -__v')
+            .lean()
+            .exec();
+
+        if (!user) throw new NotFoundException({ message: 'User not found' });
         return user;
     }
 
@@ -26,6 +26,8 @@ export class UsersService {
             folder: 'profile-images/',
             transformation: { format: 'webp', fetch_format: 'webp' }
         });
+
+        if (result.http_code >= 400) throw new BadRequestException({ name: result.name, message: result.message })
 
         await this.userModel.findByIdAndUpdate(userId, {
             profile_img: {

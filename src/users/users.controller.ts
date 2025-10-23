@@ -3,7 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfileImageFilePipe } from '../common/pipes/profile-image-file.pipe';
 import { AuthGuard } from '../common/guards/auth.guard';
 import { Roles } from '../common/decorators/roles.decorator';
-import { Role } from '../lib/roles.enum';
+import { Role } from '../common/enums/roles.enum';
 import { User } from '../common/decorators/user.decorator';
 import { UsersService } from './users.service';
 

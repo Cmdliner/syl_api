@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Schema as MongooseSchema } from "mongoose";
 import { Types } from "mongoose";
 import { DELIVERY_TYPE, PARCEL_STATUS, PARCEL_TYPE } from "src/lib/constants";
-import { DeliveryType, ParcelStatus, ParcelType } from "src/lib/parcel.enum";
+import { DeliveryType, ParcelStatus, ParcelType } from "src/common/enums/parcel.enum";
 import { createTrackingID } from "src/lib/utils";
 
 @Schema({ timestamps: true })
@@ -19,6 +19,9 @@ export class Parcel {
         fullname: string;
         phone_number: string;
     }
+
+    @Prop([{ type: Object, required: true, minLength: 1, maxLength: 5 }])
+    images: Array<{ public_id: string; secure_url: string; }>
 
     @Prop({ type: String })
     dimensions: string;
