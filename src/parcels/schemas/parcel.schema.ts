@@ -53,6 +53,7 @@ export class Parcel {
                 }
             }
         },
+        _id: false,
         required: true
     })
     pickup_location: {
@@ -67,9 +68,7 @@ export class Parcel {
         type: {
             address: { type: String, required: true },
             geo: {
-                type: String,
-                enum: ['Point'],
-                required: true,
+                type: { type: String, enum: ['Point'], required: true },
                 coordinates: {
                     type: [Number],
                     required: true,
@@ -80,6 +79,7 @@ export class Parcel {
                 }
             }
         },
+        _id: false,
         required: true
     })
     dropoff_location: {

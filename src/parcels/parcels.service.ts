@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { Parcel } from './schemas/parcel.schema';
 import { InjectModel } from '@nestjs/mongoose';
@@ -31,7 +31,7 @@ export class ParcelsService {
         const uploadResult = await Promise.all(parcel_images.map(processImage));
 
         const uploadErrors = uploadResult.filter(r => r.http_code >= 400);
-        if (uploadErrors) throw new UnprocessableEntityException({ message: 'Error processing images', details: uploadErrors });
+        if (uploadErrors.length) throw new UnprocessableEntityException({ message: 'Error processing images', details: uploadErrors });
 
         const parcelImagesData = uploadResult.map(r => { return { public_id: r.public_id, secure_url: r.secure_url } });
 
@@ -47,18 +47,17 @@ export class ParcelsService {
             delivery_cost: parcelData.delivery_cost,
             pickup_location: {
                 address: parcelData.pickup_location.address,
-                geo: parcelData.pickup_location.coordinates
+                geo: { type: 'Point', coordinates: parcelData.pickup_location.coordinates.map(Number) }
             },
             dropoff_location: {
                 address: parcelData.dropoff_location.address,
-                geo: parcelData.dropoff_location.coordinates
+                geo: { type: 'Point', coordinates: parcelData.dropoff_location.coordinates.map(Number) }
             },
 
 
         });
 
         return { tracking_id: parcel.tracking_id }
-
     }
 
     async getParcel(parcel_id: MongoId, user_id: MongoId) {
@@ -68,9 +67,16 @@ export class ParcelsService {
         const parcel = await this.parcelModel.findById(parcel_id).lean().exec();
         if (!parcel) throw new NotFoundException({ message: 'Parcel not found' });
 
-        const isAuthorized = compareObjectIds(parcel.assigned_rider, user_id) || compareObjectIds(parcel.sender, user_id);
+        const isAuthorized = (parcel.assigned_rider && compareObjectIds(parcel.assigned_rider, user_id)) || compareObjectIds(parcel.sender, user_id);
         if (!isAuthorized) throw new NotFoundException({ message: 'Parcel not found' });
 
         return parcel;
     }
+
+    async getCustomerParcels(customer_id?: MongoId) {
+        const userParcels = await this.parcelModel.find({ sender: customer_id });
+        return userParcels;
+
+    }
 }
+

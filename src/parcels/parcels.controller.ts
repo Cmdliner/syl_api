@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, NotFoundException, Param, Post, Query, UnprocessableEntityException, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/enums/roles.enum';
 import { AuthGuard } from 'src/common/guards/auth.guard';
@@ -22,7 +22,6 @@ export class ParcelsController {
         @UploadedFiles() files: Array<Express.Multer.File>,
         @User() user: RequestUser,
         @Body() parcelData: CreateParcelDto) {
-
         const { tracking_id } = await this.parcelsService.createParcel(user.id, files, parcelData);
         return { success: true, message: 'Parcel created successfully', data: { tracking_id } };
     }
@@ -37,6 +36,16 @@ export class ParcelsController {
         const parcel = await this.parcelsService.getParcel(parcelId, userId);
 
         return { success: true, message: 'Parcels retrieved', data: { parcel } };
+    }
+
+    @Roles(Role.RIDER, Role.CUSTOMER)
+    @Get('')
+    async getParcelsForCustomerOrRider(
+        @User() user: RequestUser,
+        @Query('customerId', IsObjectIdPipe) customerId: MongoId,
+    ) {
+        const parcels = await this.parcelsService.getCustomerParcels(customerId);
+        return { success: true, message: 'Parcels retrieved', data: { parcels } };
     }
 
 }
