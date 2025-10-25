@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../users/schemas/user.schema';
@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { CreateRiderDto } from './dtos/create-rider.dto';
 import { Customer } from 'src/users/schemas/discriminators/customer.schema';
 import { Rider } from 'src/users/schemas/discriminators/rider.schema';
+import { Otp } from '../users/schemas/otp.model';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +16,7 @@ export class AuthService {
         @InjectModel(User.name) private readonly userModel: Model<User>,
         @InjectModel(Customer.name) private readonly customerModel: Model<Customer>,
         @InjectModel(Rider.name) private readonly riderModel: Model<Rider>,
+        @InjectModel(Otp.name) private readonly otpModel: Model<Otp>,
         private readonly jwtService: JwtService
     ) { }
 
@@ -24,7 +26,7 @@ export class AuthService {
             $or: [
                 { email: customerData.email },
                 { phone_number: customerData.phone_number },
-                
+
             ]
         });
 
@@ -81,7 +83,7 @@ export class AuthService {
         const access_token = await this.generateJWT({ sub: user.id, role: user.role });
         return access_token;
     }
-    
+
     async loginCustomer(email: string, password: string) {
         const user = await this.customerModel.findOne({ email });
         if (!user) throw new UnauthorizedException({ message: 'Invalid credentials' });
@@ -93,8 +95,47 @@ export class AuthService {
         return access_token;
     }
 
-    private async generateJWT(payload: JwtPayload, secret: string = process.env.JWT_SECRET!) {
-        return this.jwtService.signAsync<JwtPayload>(payload, { secret })
+    async forgotPassword(email: string) {
+        const user = await this.userModel.findOne({ email });
+        console.log({user})
+        if (!user) return;
+
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        const otpRecord = await this.otpModel.create({
+            userId: user._id,
+            token: otp,
+            kind: 'password_reset',
+            expiresAt: new Date(Date.now() + 10 * 60 * 1000)
+        });
+        // !todo => Send OTP to user's email
+        return;
+    }
+
+    async verifyOtp(otpId: MongoId) {
+        const otpRecord = await this.otpModel.findById(otpId);
+        if (!otpRecord) throw new NotFoundException({ message: 'OTP not found' });
+
+        if (otpRecord.expiresAt < new Date()) throw new BadRequestException({ message: 'OTP has expired' });
+
+        const passwordResetToken = await this.generateJWT({ sub: otpRecord.userId } as any, process.env.RESET_PASSWORD_SECRET!, '5m');
+
+        return { success: true, message: 'OTP is valid', token: passwordResetToken };
+    }
+
+    async resetPassword(token: string, newPassword: string) {
+        const payload = this.jwtService.verify<JwtPayload>(token, { secret: process.env.RESET_PASSWORD_SECRET! });
+
+        const user = await this.userModel.findById(payload.sub);
+        if (!user) throw new NotFoundException({ message: 'User not found' });
+
+        const passwordHash = await hash(newPassword, 10);
+        user.password_hash = passwordHash;
+        await user.save();
+    }
+
+    private async generateJWT(payload: JwtPayload, secret: string = process.env.JWT_SECRET!, expiresIn: any = '30d') {
+        return this.jwtService.signAsync<JwtPayload>(payload, { secret, expiresIn });
     }
 
     private async verifyPassword(password: string, hash: string) {

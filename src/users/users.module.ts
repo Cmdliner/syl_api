@@ -6,17 +6,21 @@ import { UsersService } from './users.service';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { Customer, CustomerSchema } from './schemas/discriminators/customer.schema';
 import { Rider, RiderSchema } from './schemas/discriminators/rider.schema';
+import { Otp, OtpSchema } from './schemas/otp.model';
 
 @Module({
     imports: [
-        MongooseModule.forFeature([{
-            name: User.name,
-            schema: UserSchema,
-            discriminators: [
-                { name: Customer.name, schema: CustomerSchema },
-                { name: Rider.name, schema: RiderSchema }
-            ]
-        }]),
+        MongooseModule.forFeature([
+            {
+                name: User.name,
+                schema: UserSchema,
+                discriminators: [
+                    { name: Customer.name, schema: CustomerSchema },
+                    { name: Rider.name, schema: RiderSchema }
+                ]
+            },
+            { name: Otp.name, schema: OtpSchema }
+        ]),
         CloudinaryModule
     ],
     providers: [UsersService],
