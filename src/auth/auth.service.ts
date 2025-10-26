@@ -96,8 +96,7 @@ export class AuthService {
     }
 
     async forgotPassword(email: string) {
-        const user = await this.userModel.findOne({ email });
-        console.log({user})
+        const user = await this.customerModel.findOne({ email });
         if (!user) return;
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();

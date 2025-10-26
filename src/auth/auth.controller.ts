@@ -50,7 +50,7 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @Post('verify-otp/link/:otpId')
     async verifyOtp(@Param('otpId', IsObjectIdPipe) otpId: MongoId, @Res() res: Response) {
-        const token = await this.authService.verifyOtp(otpId);
+        const { token } = await this.authService.verifyOtp(otpId);
 
         const frontendUrl = process.env.FRONTEND_URL;
         const redirectUrl = `${frontendUrl}/reset-password/${token}`;
@@ -60,8 +60,8 @@ export class AuthController {
 
     @HttpCode(HttpStatus.OK)
     @Patch('reset-password/')
-    async resetPassword(@Param('token') token: string, @Body() resetPasswordDto: ResetPasswordDto) {
-        await this.authService.resetPassword(token, resetPasswordDto.new_password);
+    async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+        await this.authService.resetPassword(resetPasswordDto.token, resetPasswordDto.new_password);
         return { success: true, message: 'Password reset successfully' };
     }
 }
