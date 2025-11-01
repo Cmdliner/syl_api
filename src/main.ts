@@ -32,7 +32,7 @@ async function bootstrap() {
     }));
     app.useGlobalFilters(new HttpExceptionFilter());
     
-    const PORT = process.env.PORT ?? 3000;
+    const PORT = process.env.PORT || 3000;
     await app.listen(PORT, '0.0.0.0', () => console.log(`Server listening on port ${PORT}`));
 }
 bootstrap();
